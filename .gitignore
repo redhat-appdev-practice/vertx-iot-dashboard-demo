@@ -4,3 +4,4 @@ target
 src/main/frontend/node_modules
 src/main/frontend/yarn.lock
 src/main/resources/webroot
+src/main/frontend/.quasar
