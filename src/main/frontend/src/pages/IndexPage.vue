@@ -56,7 +56,7 @@ const chartOptions = ref({
     softMax: 100,
     softMin: 65,
     title: {
-      text: unitLabel.value
+      text: '°C'
     }
   }] as YAxisOptions[],
   plotOptions: {
@@ -68,7 +68,6 @@ const chartOptions = ref({
   } as PlotOptions,
   series: [] as SeriesLineOptions[]
 });
-
 
 interface Reading {
   name: string
