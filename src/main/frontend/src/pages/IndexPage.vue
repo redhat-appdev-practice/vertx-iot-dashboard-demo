@@ -1,7 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
     <Chart :options="chartOptions" class="col-grow" />
-    <q-toggle v-model="useCentigrade" :label="unitLabel" />
   </q-page>
 </template>
 
@@ -24,16 +23,6 @@ import exportingInit from 'highcharts/modules/exporting'
 import EventBus from "@vertx/eventbus-bridge-client.js";
 
 exportingInit(Highcharts);
-
-const useCentigrade = ref(true);
-
-const unitLabel = computed(() => {
-  if (useCentigrade.value) {
-    return '°C';
-  } else {
-    return '°F';
-  }
-});
 
 const chartOptions = ref({
   title: {
@@ -80,26 +69,12 @@ const chartOptions = ref({
   series: [] as SeriesLineOptions[]
 });
 
-watch(useCentigrade, (newVal, oldVal) => {
-  chartOptions.value.yAxis[0].title.text = useCentigrade.value ? '°C' : '°F';
-  chartOptions.value.yAxis[0].softMax = 212;
-  chartOptions.value.yAxis[0].softMin = 140;
-
-  if (newVal && !oldVal) {
-    chartOptions.value.series
-  } else if (oldVal && !newVal) {
-
-  }
-});
 
 interface Reading {
   name: string
   value: number
   timestamp: number
 }
-
-const C_TO_F_CONVERSION_FACTOR = 1.8;
-const C_TO_F_DEGREE_OFFSET = 32;
 
 const ebOptions = {
    vertxbus_reconnect_attempts_max: Infinity, // Max reconnect attempts
@@ -116,10 +91,6 @@ eb.onopen = () => {
     if (error) {
       console.log(`Error from event bus: ${JSON.stringify(error)}`);
     } else {
-      if (!useCentigrade.value) {
-        const cValue = message.body.value;
-        message.body.value = (cValue * C_TO_F_CONVERSION_FACTOR + C_TO_F_DEGREE_OFFSET);
-      }
       const label = message.body.name.split(':')[0]
       const seriesIndex = chartOptions.value.series.findIndex(s => s.name === label);
       if (seriesIndex >= 0) {
