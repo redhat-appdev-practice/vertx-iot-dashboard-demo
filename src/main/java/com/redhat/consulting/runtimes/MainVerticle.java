@@ -67,7 +67,7 @@ public class MainVerticle extends AbstractVerticle {
   private <T> void pollSensors(Promise<T> tPromise) {
     LOG.info("Polling Sensors");
     try {
-      Process p = Runtime.getRuntime().exec("sensors -j");
+      Process p = Runtime.getRuntime().exec("sensors -j -A coretemp-isa-0000");
       BufferedReader stdOutput = new BufferedReader(new InputStreamReader(p.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String s = null;
