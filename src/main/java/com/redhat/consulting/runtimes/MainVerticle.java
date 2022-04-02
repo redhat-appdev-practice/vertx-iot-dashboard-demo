@@ -99,7 +99,7 @@ public class MainVerticle extends AbstractVerticle {
                                 .put("value", reading.getValue())
                                 .put("timestamp", lastUpdate);
       LOG.info("Sending: {} - {} - {}", lastUpdate, reading.getKey(), reading.getValue());
-      vertx.eventBus().send("iot.temp.reading", body);
+      vertx.eventBus().publish("iot.temp.reading", body);
     }
   }
 
