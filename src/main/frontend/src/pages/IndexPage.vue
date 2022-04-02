@@ -1,11 +1,11 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page ref="indexPage" v-resize="updateChartToFitPage" class="row items-center justify-evenly page-no-overflow">
     <Chart :options="chartOptions" class="col-grow" />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import {ref, onMounted} from 'vue';
 
 import { Chart } from 'highcharts-vue';
 import {
@@ -21,6 +21,7 @@ import {
 import Highcharts from 'highcharts';
 import exportingInit from 'highcharts/modules/exporting'
 import EventBus from "@vertx/eventbus-bridge-client.js";
+import {QPage} from "quasar";
 
 exportingInit(Highcharts);
 
@@ -69,6 +70,34 @@ const chartOptions = ref({
   series: [] as SeriesLineOptions[]
 });
 
+const updateChartToFitPage = () => {
+  const rect = indexPage.value.$el.getBoundingClientRect();
+  const left = rect.x;
+  const top = rect.y;
+  const right = window.visualViewport.width;
+  const bottom = window.visualViewport.height;
+  const chartArea = {
+    height: (bottom - top),
+    width: (right - left)
+  }
+  if (chartArea !== undefined && chartArea !== null) {
+    console.log(`Dimensions: ${chartArea.width} x ${chartArea.height}`)
+    chartOptions.value.chart.height = chartArea.height;
+    chartOptions.value.chart.width = chartArea.width;
+  } else {
+    console.log("Reference is null");
+  }
+}
+
+const indexPage = ref<Element>();
+defineExpose({ indexPage });
+
+onMounted(() => {
+  updateChartToFitPage();
+});
+
+addEventListener('orientationchange', updateChartToFitPage);
+
 interface Reading {
   name: string
   value: number
@@ -83,6 +112,7 @@ const ebOptions = {
    vertxbus_randomization_factor: 0.5 // Randomization factor between 0 and 1
 };
 const ebUrl = `${window.location.protocol}//${window.location.host}/eventbus`;
+// const ebUrl = `${window.location.protocol}//localhost:8080/eventbus`;
 const eb = new EventBus(ebUrl, ebOptions);
 
 eb.onopen = () => {
@@ -111,4 +141,6 @@ eb.onopen = () => {
 <style lang="sass">
 .highcharts-root
   height: 100%
+.page-no-overflow
+  overflow: hidden
 </style>

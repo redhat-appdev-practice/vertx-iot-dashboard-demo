@@ -36,6 +36,7 @@ public class MainVerticle extends AbstractVerticle {
     periodic = vertx.setPeriodic(1000, this::wrapSensorPoll);
 
     var router = Router.router(vertx);
+//    router.route().handler(CorsHandler.create(".*.").allowCredentials(true));
 
     SockJSHandler sockJsHandler = SockJSHandler.create(vertx);
     SockJSBridgeOptions bridgeOptions = new SockJSBridgeOptions();
