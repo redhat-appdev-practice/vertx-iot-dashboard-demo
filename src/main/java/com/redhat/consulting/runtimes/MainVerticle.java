@@ -66,7 +66,6 @@ public class MainVerticle extends AbstractVerticle {
   }
 
   private <T> void pollSensors(Promise<T> tPromise) {
-    LOG.info("Polling Sensors");
     try {
       Process p = Runtime.getRuntime().exec("sensors -j -A coretemp-isa-0000");
       BufferedReader stdOutput = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -98,7 +97,6 @@ public class MainVerticle extends AbstractVerticle {
                                 .put("name", reading.getKey())
                                 .put("value", reading.getValue())
                                 .put("timestamp", lastUpdate);
-      LOG.info("Sending: {} - {} - {}", lastUpdate, reading.getKey(), reading.getValue());
       vertx.eventBus().publish("iot.temp.reading", body);
     }
   }
