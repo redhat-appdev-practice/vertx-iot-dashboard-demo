@@ -1,0 +1,11 @@
+{
+  "name": "com.redhat.consulting.cnad",
+  "version": "0.0.1",
+  "description": "A Quasar Project",
+  "author": "Deven Phillips <deven.phillips@redhat.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/cli": "^2.0.0",
+    "@capacitor/core": "^2.0.0"
+  }
+}
