@@ -27,15 +27,6 @@ client.onMessageArrived = (message) => {
 client.connect({
   onSuccess: () => {
     $q.notify({ message: 'Connected', type: 'info' });
-
-    client.subscribe('aggregateStats', {
-      onSuccess: () => {
-        $q.notify({ message: 'Subscribed to aggregate stats topic', type: 'info' });
-      },
-      onFailure: (err) => {
-        $q.notify({ message: err.errorMessage, type: 'error' });
-      },
-    });
   },
   onFailure: () => {
     $q.notify({ message: 'Failed to connect', type: 'error' })

@@ -1,7 +1,0 @@
-{
-  "appId": "com.redhat.consulting.cnad.j4k.2022.iot",
-  "appName": "J4K Vert.x IoT",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "www"
-}
