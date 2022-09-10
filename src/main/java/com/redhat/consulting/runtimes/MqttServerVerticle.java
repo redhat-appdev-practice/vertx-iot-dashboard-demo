@@ -1,6 +1,7 @@
 package com.redhat.consulting.runtimes;
 
-import io.vertx.core.*;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Promise;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mqtt.MqttEndpoint;
@@ -9,7 +10,7 @@ import io.vertx.mqtt.MqttServerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.vertx.mqtt.messages.codes.MqttPubAckReasonCode.*;
+import static io.vertx.mqtt.messages.codes.MqttPubAckReasonCode.PAYLOAD_FORMAT_INVALID;
 
 public class MqttServerVerticle extends SharedDataVerticle {
 	
@@ -17,7 +18,7 @@ public class MqttServerVerticle extends SharedDataVerticle {
 	
 	@Override
 	public void start(Promise<Void> startPromise) throws Exception {
-		shared = vertx.sharedData();
+		LOG.atInfo().setMessage("Mqtt deplying").log();
 		
 		MqttServerOptions mqttOpts =
 				new MqttServerOptions()
@@ -30,8 +31,10 @@ public class MqttServerVerticle extends SharedDataVerticle {
 		mqttServer.endpointHandler(this::mqttEndpointHandler)
 				.listen(mqttPort)
 				.onSuccess(this::mqttServerListenHandler)
-				.onFailure(this::mqttErrorHandler)
+				.<Void>mapEmpty()
 				.compose(this::initShared)
+				.compose(this::storeSharedVariables)
+				.<Void>mapEmpty()
 				.onComplete(startPromise);
 	}
 	
@@ -52,9 +55,8 @@ public class MqttServerVerticle extends SharedDataVerticle {
 		}
 		if (endpoint.will() != null) {
 			LOG.atDebug()
-					.setMessage("[will topic = {} msg = {} QoS = {} isRetain = {}]")
+					.setMessage("[will topic = {} QoS = {} isRetain = {}]")
 					.addArgument(() -> endpoint.will().getWillTopic())
-					.addArgument(() -> new String(endpoint.will().getWillMessageBytes()))
 					.addArgument(() -> endpoint.will().getWillQos())
 					.addArgument(() -> endpoint.will().isWillRetain())
 					.log();
@@ -65,24 +67,19 @@ public class MqttServerVerticle extends SharedDataVerticle {
 		// accept connection from the remote client
 		endpoint.accept(false);
 		
-		endpoint.subscriptionAutoAck(true);
-		
 		endpoint.publishHandler(msg -> {
+			LOG.atDebug().setMessage("Message Received").log();
 			if (msg.topicName().contentEquals("vibration-data")) {
 				try {
 					var data = new JsonObject(msg.payload());
+					LOG.atDebug().setMessage("Data: x - {}, y - {}").addArgument(data.getInteger("x")).addArgument(data.getInteger("y")).log();
 					
 					// Store the vibration data into the distributed data grid
 					var xFuture = xMotion.addAndGet(Math.abs(data.getInteger("x")));
 					var yFuture = yMotion.addAndGet(Math.abs(data.getInteger("y")));
 					var countFuture = eventCounter.incrementAndGet();
 					CompositeFuture
-							.all(xFuture, yFuture, countFuture)
-							.onSuccess(res -> endpoint.publishAcknowledge(msg.messageId(), SUCCESS, null))
-							.onFailure(res -> {
-								endpoint.publishAcknowledge(msg.messageId(), UNSPECIFIED_ERROR, null);
-								vertx.eventBus().publish("message-errors", res.getCause().getMessage());
-							});
+							.all(xFuture, yFuture, countFuture);
 				} catch (DecodeException de) {
 					LOG.atError().setMessage("Unable to decode MQTT message payload").setCause(de).log();
 					endpoint.publishAcknowledge(msg.messageId(), PAYLOAD_FORMAT_INVALID, null);

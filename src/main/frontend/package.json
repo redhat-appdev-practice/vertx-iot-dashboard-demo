@@ -7,12 +7,14 @@
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "serve": "quasar dev",
+    "build": "quasar build"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "@types/paho-mqtt": "^1.0.6",
-    "@vueuse/gesture": "^2.0.0-beta.1",
+    "@vertx/eventbus-bridge-client.js": "^1.0.0-3-SNAPSHOT",
     "paho-mqtt": "^1.1.0",
     "quasar": "^2.6.0",
     "vue": "^3.0.0",
@@ -24,7 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "autoprefixer": "^10.4.2",
-    "eslint": "^8.10.0",
+    "eslint": "8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-vue": "^9.0.0",

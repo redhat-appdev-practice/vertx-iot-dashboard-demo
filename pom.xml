@@ -37,15 +37,9 @@
       <version>2.0.0</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${log4j.version}</version>
-      <scope>compile</scope>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -77,8 +71,13 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.eclipse.jkube</groupId>
+        <artifactId>kubernetes-maven-plugin</artifactId>
+        <version>1.8.0</version>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.10.1</version>
         <configuration>
           <source>17</source>
           <target>17</target>
@@ -111,6 +110,8 @@
         </executions>
         <configuration>
           <redeploy>true</redeploy>
+          <launcher>com.redhat.consulting.runtimes.CustomLauncher</launcher>
+          <verticle>com.redhat.consulting.runtimes.MainVerticle</verticle>
         </configuration>
       </plugin>
       <plugin>
@@ -124,27 +125,33 @@
         </configuration>
         <executions>
           <execution>
-            <id>install-node-and-yarn</id>
+            <id>install-node-and-npm</id>
             <goals>
-              <goal>install-node-and-yarn</goal>
+              <goal>install-node-and-npm</goal>
             </goals>
-            <phase>prepare-package</phase>
+            <phase>initialize</phase>
+            <configuration>
+              <nodeVersion>v16.17.0</nodeVersion>
+            </configuration>
           </execution>
           <execution>
             <id>install-deps</id>
             <goals>
-              <goal>yarn</goal>
+              <goal>npm</goal>
             </goals>
-            <phase>prepare-package</phase>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+            <phase>none</phase>
           </execution>
           <execution>
             <id>build-spa</id>
             <goals>
-              <goal>yarn</goal>
+              <goal>npm</goal>
             </goals>
-            <phase>prepare-package</phase>
+            <phase>none</phase>
             <configuration>
-              <arguments>build</arguments>
+              <arguments>run build</arguments>
             </configuration>
           </execution>
         </executions>

@@ -1,27 +1,63 @@
 <template>
-  <q-page class="row items-center justify-evenly" v-drag="dragHandler">
+  <q-page class="col col-grow items-lg-stretch justify-evenly">
+    HELLO {{ xCoord }} x {{ yCoord }}<br />
+    Aggregates: {{ aggregate.x }} x {{ aggregate.y }} @ {{ aggregate.t }} from {{ aggregate.n }}
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { useDrag } from '@vueuse/gesture';
 import { Client, Message } from 'paho-mqtt';
 import { useQuasar, date } from 'quasar';
 import { ref } from 'vue';
+import EventBus from '@vertx/eventbus-bridge-client.js';
+
+const ebOptions = {
+  vertxbus_reconnect_attempts_max: Infinity, // Max reconnect attempts
+  vertxbus_reconnect_delay_min: 1000, // Initial delay (in ms) before first reconnect attempt
+  vertxbus_reconnect_delay_max: 5000, // Max delay (in ms) between reconnect attempts
+  vertxbus_reconnect_exponent: 2, // Exponential backoff factor
+  vertxbus_randomization_factor: 0.5, // Randomization factor between 0 and 1
+};
+
+const loc = window.location;
+const eb = new EventBus(`${loc.protocol}//${loc.host}/eventbus`, ebOptions);
+
+const aggregate = ref({
+  x: 0,
+  y: 0,
+  t: 0,
+  n: '',
+});
+
+eb.onopen = () => {
+  eb.registerHandler('iot.motion.aggregate', (err, msg) => {
+    if (!err) {
+      const {
+        body: {
+          xAgg,
+          yAgg,
+          timestamp,
+          node,
+        },
+      } = msg;
+      aggregate.value = {
+        x: xAgg,
+        y: yAgg,
+        t: timestamp,
+        n: node,
+      };
+    }
+  });
+};
 
 const $q = useQuasar();
+const xCoord = ref<number>(0);
+const yCoord = ref<number>(0);
 
-const client = new Client('localhost', Number('4321'), 'capacitor-client');
+const client = new Client('localhost', Number('4321'), 'web-client');
 
 client.onConnectionLost = (responseObject) => {
   $q.notify({ message: responseObject.errorMessage, type: 'error' });
-};
-
-client.onMessageArrived = (message) => {
-  $q.notify({ message: message.payloadString, type: 'info' });
-  const msg = new Message('Ping');
-  msg.destinationName = 'testing';
-  client.send(msg);
 };
 
 client.connect({
@@ -37,17 +73,34 @@ const sendVibrationData = (x: number, y: number) => {
   const timestamp = Date.now();
   const isoTimestamp = date.formatDate(timestamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ');
   const messageData = JSON.stringify({ x, y, timestamp: isoTimestamp });
-  const msg = new Message(messageData);
-  msg.destinationName = 'vibration-data';
-  client.send(msg);
+  xCoord.value = x;
+  yCoord.value = y;
+  if (client.isConnected()) {
+    const msg = new Message(messageData);
+    msg.destinationName = 'vibration-data';
+    client.send(msg);
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(`Client not connected: ${messageData}`);
+  }
 }
 
-useDrag(
-  ({ movement: [x, y], dragging }) => {
-    if (!dragging && client.isConnected()) {
-      sendVibrationData(x, y);
-    }
-  },
-)
+const handleMotionEvent = (evt: DeviceMotionEvent) => {
+  const data = { x: evt?.accelerationIncludingGravity?.x, y: evt?.accelerationIncludingGravity?.y };
+  if (data?.x !== undefined && data?.y !== undefined && data?.x !== null && data?.y !== null) {
+    sendVibrationData(data.x, data.y);
+  }
+}
+
+const handleDragEvent = (evt: MouseEvent) => {
+  const data = { x: evt?.clientX, y: evt.clientY };
+  if (data?.x !== undefined && data?.y !== undefined && data?.x !== null && data?.y !== null) {
+    sendVibrationData(data.x, data.y);
+  }
+}
+
+window.addEventListener('devicemotion', handleMotionEvent, true);
+
+window.addEventListener('mousedown', handleDragEvent, true);
 
 </script>

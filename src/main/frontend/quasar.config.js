@@ -29,9 +29,7 @@ module.exports = configure((/* ctx */) => ({
   // app boot file (/src/boot)
   // --> boot files are part of "main.js"
   // https://v2.quasar.dev/quasar-cli-vite/boot-files
-  boot: [
-    'gestures',
-  ],
+  boot: [],
 
   // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
   css: [
@@ -73,7 +71,7 @@ module.exports = configure((/* ctx */) => ({
     // ignorePublicFolder: true,
     // minify: false,
     // polyfillModulePreload: true,
-    // distDir
+    distDir: "../resources/webroot/",
 
     // extendViteConf (viteConf) {},
     // viteVuePluginOptions: {},

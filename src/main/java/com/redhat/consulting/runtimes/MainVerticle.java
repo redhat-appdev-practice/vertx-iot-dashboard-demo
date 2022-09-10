@@ -1,39 +1,17 @@
 package com.redhat.consulting.runtimes;
 
-import io.netty.handler.codec.mqtt.MqttProperties;
-import io.netty.handler.codec.mqtt.MqttQoS;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.MessageConsumer;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
-import io.vertx.mqtt.MqttEndpoint;
-import io.vertx.mqtt.MqttServer;
-import io.vertx.mqtt.MqttServerOptions;
-import io.vertx.mqtt.MqttTopicSubscription;
-import io.vertx.mqtt.messages.codes.MqttSubAckReasonCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-public class MainVerticle extends AbstractVerticle {
+public class MainVerticle extends SharedDataVerticle {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
 	
@@ -41,6 +19,7 @@ public class MainVerticle extends AbstractVerticle {
 	
 	@Override
 	public void start(Promise<Void> startPromise) throws Exception {
+		LOG.atError().setMessage("MainVerticle Loading").log();
 		var router = Router.router(vertx);
 		
 		SockJSHandler sockJsHandler = SockJSHandler.create(vertx);
@@ -49,6 +28,7 @@ public class MainVerticle extends AbstractVerticle {
 		router.mountSubRouter("/eventbus", sockJsHandler.bridge(bridgeOptions));
 		
 		staticHandler = StaticHandler.create();
+		staticHandler.setIndexPage("index.html");
 		router.route().handler(staticHandler);
 		
 		// Handler of last resort... If no other path succeeds, this will always serve `index.html`
@@ -57,12 +37,22 @@ public class MainVerticle extends AbstractVerticle {
 		vertx.createHttpServer()
 				.requestHandler(router)
 				.listen(8080)
+				.<Void>mapEmpty()
+				.compose(this::initShared)
+				.compose(this::storeSharedVariables)
+				.compose(this::zeroValues)
+				.<Void>mapEmpty()
 				.compose(this::deployMqttServerVerticle)
+				.compose(this::deployAggregatorVerticle)
 				.<Void>mapEmpty()
 				.onComplete(startPromise);
 	}
 	
-	private Future<String> deployMqttServerVerticle(HttpServer httpServer) {
+	private Future<String> deployAggregatorVerticle(String s) {
+		return vertx.deployVerticle(new AggregatorVerticle());
+	}
+	
+	private Future<String> deployMqttServerVerticle(Void _v) {
 		return vertx.deployVerticle(new MqttServerVerticle());
 	}
 	
