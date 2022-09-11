@@ -99,6 +99,8 @@
                 <ports>
                   <port>8080</port>
                   <port>4321</port>
+                  <port>8778</port>
+                  <port>9779</port>
                 </ports>
               </build>
             </image>
