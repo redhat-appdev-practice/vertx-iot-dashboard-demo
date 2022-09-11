@@ -80,7 +80,7 @@
             <image>
               <name>vertx-iot-demo</name>
               <build>
-                <from>quay.io/jkube/jkube-java:0.0.15</from>
+                <from>quay.io/jkube/jkube-java-11:0.0.16</from>
                 <cmd>java -jar /maven/${project.artifactId}-${project.version}.jar</cmd>
                 <assembly>
                   <layers>
@@ -96,6 +96,10 @@
                     </layer>
                   </layers>
                 </assembly>
+                <ports>
+                  <port>8080</port>
+                  <port>4321</port>
+                </ports>
               </build>
             </image>
           </images>
