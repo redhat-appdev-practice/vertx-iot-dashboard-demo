@@ -89,9 +89,6 @@
                 <webport>8080</webport>
               </vertx>
             </config>
-            <entrypoint>
-              <shell>java -jar /deployments/${project.name}-${project.version}.jar</shell>
-            </entrypoint>
           </generator>
         </configuration>
       </plugin>
