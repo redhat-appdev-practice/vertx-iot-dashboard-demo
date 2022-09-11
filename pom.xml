@@ -81,7 +81,7 @@
               <name>vertx-iot-demo</name>
               <build>
                 <from>quay.io/jkube/jkube-java:0.0.15</from>
-                <cmd>java -jar ${project.artifactId}-${project.version}.jar</cmd>
+                <cmd>java -jar /maven/${project.artifactId}-${project.version}.jar</cmd>
                 <assembly>
                   <layers>
                     <layer>
