@@ -9,12 +9,24 @@
     "lint": "eslint --ext .js,.ts,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "serve": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "devbuild": "quasar build",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "devbuild": {
+      "patterns": [".", "src"],
+      "extensions": "js,json,ts,vue"
+    }
+  },
+  "watchGlobalConfig": {
+    "setMaxListeners": true
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "@types/paho-mqtt": "^1.0.6",
     "@vertx/eventbus-bridge-client.js": "^1.0.0-3-SNAPSHOT",
+    "axios": "^0.27.2",
     "paho-mqtt": "^1.1.0",
     "quasar": "^2.6.0",
     "vue": "^3.0.0",
@@ -30,6 +42,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-vue": "^9.0.0",
+    "npm-watch": "^0.11.0",
     "typescript": "^4.5.4"
   },
   "engines": {

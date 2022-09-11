@@ -69,11 +69,13 @@ module.exports = configure((/* ctx */) => ({
     // env: {},
     // rawDefine: {}
     // ignorePublicFolder: true,
-    // minify: false,
+    // minify: fals e,
     // polyfillModulePreload: true,
     distDir: "../resources/webroot/",
 
-    // extendViteConf (viteConf) {},
+    // extendViteConf: (viteConf) => {
+    //   viteConf.global = {};
+    // },
     // viteVuePluginOptions: {},
 
     // vitePlugins: [

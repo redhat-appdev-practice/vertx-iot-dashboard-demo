@@ -13,6 +13,7 @@
     <vertx.launcher>com.redhat.consulting.runtimes.CustomLauncher</vertx.launcher>
     <vertx-maven-plugin.version>1.0.27</vertx-maven-plugin.version>
     <log4j.version>2.17.1</log4j.version>
+    <vertx.redeploy.scan.period>5000</vertx.redeploy.scan.period>
   </properties>
   <dependencies>
     <dependency>
