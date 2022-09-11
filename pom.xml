@@ -75,6 +75,18 @@
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>kubernetes-maven-plugin</artifactId>
         <version>1.8.0</version>
+        <configuration>
+          <generator>
+            <config>
+              <vertx>
+                <webport>8080</webport>
+              </vertx>
+            </config>
+            <entrypoint>
+              <shell>java -jar /deployments/${project.name}-${project.version}.jar</shell>
+            </entrypoint>
+          </generator>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
