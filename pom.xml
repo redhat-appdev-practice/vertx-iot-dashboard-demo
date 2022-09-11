@@ -88,7 +88,6 @@
                       <fileSets>
                         <fileSet>
                           <directory>${project.basedir}/target/</directory>
-                          <outputDirectory>/deployments/</outputDirectory>
                           <includes>
                             <include>*.jar</include>
                           </includes>
