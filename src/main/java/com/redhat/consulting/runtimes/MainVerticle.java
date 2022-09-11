@@ -62,12 +62,17 @@ public class MainVerticle extends SharedDataVerticle {
 		var predictedWebsocketUri = reqHost.replace("/config", "/eventbus");
 		
 		var mqttHost = System.getenv().getOrDefault("VERTX_MQTT_HOST", predictedMqttHost).split(":")[0];
-		var mqttPort = System.getenv().getOrDefault("VERTX_MQTT_PORT", "4321");
+		var mqttPort = 4321;
+		try {
+			mqttPort = Integer.parseInt(System.getenv().getOrDefault("VERTX_MQTT_PORT", "4321"));
+		} catch (NumberFormatException nfe) {
+			LOG.atWarn().setMessage("Value for 'VERTX_MQTT_PORT' of '{}' is not a valid integer.").addArgument(System.getenv().getOrDefault("VERTX_MQTT_PORT", "4321"));
+		}
 		var websocketUri = System.getenv().getOrDefault("VERTX_WEBSOCKET_URI", predictedWebsocketUri);
 		
 		var mqtt = new JsonObject()
 				           .put("host", mqttHost)
-				           .put("port", Integer.parseInt(mqttPort));
+				           .put("port", mqttPort);
 		var websocket = new JsonObject()
 				                .put("uri", websocketUri);
 		var config = new JsonObject()
