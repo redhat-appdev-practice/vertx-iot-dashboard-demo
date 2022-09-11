@@ -9,3 +9,4 @@ src/main/frontend/.quasar
 node
 src/main/frontend/node
 .mvn/**/*.jar
+vertx-start-process.id
