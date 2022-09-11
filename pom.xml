@@ -80,7 +80,23 @@
             <image>
               <name>vertx-iot-demo</name>
               <build>
+                <from>quay.io/jkube/jkube-java:0.0.15</from>
                 <cmd>java -jar ${project.artifactId}-${project.version}.jar</cmd>
+                <assembly>
+                  <layers>
+                    <layer>
+                      <fileSets>
+                        <fileSet>
+                          <directory>${project.basedir}/target/</directory>
+                          <outputDirectory>/deployments/</outputDirectory>
+                          <includes>
+                            <include>*.jar</include>
+                          </includes>
+                        </fileSet>
+                      </fileSets>
+                    </layer>
+                  </layers>
+                </assembly>
               </build>
             </image>
           </images>
