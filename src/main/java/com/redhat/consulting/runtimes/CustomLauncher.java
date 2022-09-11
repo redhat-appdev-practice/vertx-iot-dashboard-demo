@@ -16,9 +16,9 @@ public class CustomLauncher extends Launcher {
     System.setProperty("vertx.setFileCachingEnabled", "true");
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
     System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
+    System.setProperty("java.net.preferIPv4Stack", "true");
     
     if (System.getenv().containsKey("KUBERNETES_NAMESPACE")) {
-      System.setProperty("java.net.preferIPv4Stack", "true");
       System.setProperty("vertx.jgroups.config", "default-configs/default-jgroups-kubernetes.xml");
       System.setProperty("jgroups.dns.query", System.getenv().getOrDefault("jgroups.dns.query", "vertx-iot-demp"));
     }
