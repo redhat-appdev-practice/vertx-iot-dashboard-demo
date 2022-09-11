@@ -78,6 +78,7 @@
         <configuration>
           <images>
             <image>
+              <name>vertx-iot-demo</name>
               <build>
                 <cmd>java -jar ${project.artifactId}-${project.version}.jar</cmd>
               </build>
