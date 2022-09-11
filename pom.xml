@@ -76,6 +76,13 @@
         <artifactId>kubernetes-maven-plugin</artifactId>
         <version>1.8.0</version>
         <configuration>
+          <images>
+            <image>
+              <build>
+                <cmd>java -jar ${project.artifactId}-${project.version}.jar</cmd>
+              </build>
+            </image>
+          </images>
           <generator>
             <config>
               <vertx>
