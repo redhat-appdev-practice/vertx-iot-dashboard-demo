@@ -181,14 +181,14 @@
             <configuration>
               <arguments>install</arguments>
             </configuration>
-            <phase>none</phase>
+            <phase>generate-sources</phase>
           </execution>
           <execution>
             <id>build-spa</id>
             <goals>
               <goal>npm</goal>
             </goals>
-            <phase>none</phase>
+            <phase>compile</phase>
             <configuration>
               <arguments>run build</arguments>
             </configuration>
