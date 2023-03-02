@@ -14,7 +14,7 @@ cd vertx-iot-dashboard-demo
 
 ## Pre-requisites
 
-* This program requires the `sensors` command from [lm_sensors](https://github.com/lm-sensors/lm-sensors) so that it can collect temperature data from the machine where this is run.
+* In order to build this project you will need a [Java JDK](https://adoptium.net/) >= 11
 
 ## Run
 
@@ -27,5 +27,5 @@ cd vertx-iot-dashboard-demo
 ### Standalone
 
 ```
-java -jar target/iot-dashboard-1.0.0-SNAPSHOT.jar run com.redhat.consulting.runtimes.MainVerticle
+java -jar target/iot-dashboard-1.0.0-SNAPSHOT.jar
 ```
